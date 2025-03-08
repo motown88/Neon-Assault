@@ -6,8 +6,12 @@ const ship = {
 };
 
 const canvas = document.getElementById('gameCanvas');
+if (!canvas) {
+    console.error('Canvas element not found! Check the id in index.html and script loading order.');
+    throw new Error('Canvas not found');
+}
 const ctx = canvas.getContext('2d');
-const touchArea = document.getElementById('touchArea');
+const touchArea = document.getElementById('touch-area'); // Note: hyphen in id
 
 // Set canvas size
 function resizeCanvas() {
