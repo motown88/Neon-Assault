@@ -1,0 +1,48 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 600px; /* Limits width on desktop */
+    margin: auto;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    background: black;
+}
+
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #00ffff; /* Neon cyan */
+    font-family: Arial, sans-serif;
+}
+
+#touch-area {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 20%;
+    background: rgba(255, 255, 255, 0.1); /* Semi-transparent for touch zone */
+    z-index: 10;
+}
+
+@media (min-width: 768px) {
+    #game-container {
+        max-width: 100vw; /* Full width on desktop */
+        max-height: 100vh;
+    }
+}
