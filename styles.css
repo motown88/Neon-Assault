@@ -1,8 +1,7 @@
-/* Reset default styles and ensure full-screen layout */
 body {
     margin: 0;
     padding: 0;
-    background: black; /* Ensure the body background is black */
+    background: black;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -11,62 +10,74 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* Container for the game */
 #game-container {
     position: relative;
     width: 100vw;
     height: 100vh;
-    max-width: 600px; /* Limit width on desktop for better visuals */
+    max-width: 600px;
     margin: auto;
-    background: black; /* Fallback background */
-    overflow: hidden; /* Prevent scrolling */
+    background: black;
+    overflow: hidden;
 }
 
-/* Canvas styling */
 #gameCanvas {
     width: 100%;
     height: 100%;
-    background: black; /* Ensure canvas background is black */
-    display: block; /* Remove any default inline-block spacing */
+    background: black;
+    display: block;
 }
 
-/* UI styling (shields, score, level, timer) */
 #ui {
     position: absolute;
     top: 10px;
     left: 10px;
-    color: #00ffff; /* Neon cyan for text */
-    font-size: 16px;
-    z-index: 20; /* Ensure UI is above canvas */
-    text-shadow: 0 0 5px #00ffff; /* Add a neon glow effect */
+    color: #00ffff;
+    font-size: 14px; /* Slightly smaller for better fit */
+    z-index: 20;
+    text-shadow: 0 0 5px #00ffff;
+    line-height: 1.2; /* Reduce space between lines */
 }
 
-/* Touch area for mobile controls */
+#ui p {
+    margin: 2px 0; /* Minimal spacing between UI elements */
+}
+
 #touch-area {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 20%; /* 20% of the screen height for touch controls */
-    background: rgba(255, 255, 255, 0.3); /* Semi-transparent white for visibility */
-    z-index: 10; /* Above the canvas but below UI */
-    pointer-events: auto; /* Ensure touch events are captured */
+    height: 10%; /* Reduced from 20% to 10% */
+    background: black; /* Change to black */
+    z-index: 10;
+    pointer-events: auto;
 }
 
-/* Desktop-specific adjustments */
+/* Add a horizontal line with arrows and "Spin" */
+#touch-area::after {
+    content: "← Spin →";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
 @media (min-width: 768px) {
     #game-container {
-        max-width: 100vw; /* Full width on desktop */
+        max-width: 100vw;
         max-height: 100vh;
     }
 
     #touch-area {
-        display: none; /* Hide touch area on desktop since we use arrow keys */
+        display: none; /* Hide touch area on desktop */
     }
 }
 
-/* Ensure the UI text is readable on smaller screens */
 @media (max-width: 480px) {
     #ui {
-        font-size: 14px;
+        font-size: 12px; /* Even smaller on very small screens */
     }
 }
