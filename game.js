@@ -1,6 +1,5 @@
-// Declare ship before resizeCanvas
 const ship = {
-    x: 0, // Will be set in resizeCanvas
+    x: 0,
     y: 0,
     radius: 20,
 };
@@ -11,19 +10,17 @@ if (!canvas) {
     throw new Error('Canvas not found');
 }
 const ctx = canvas.getContext('2d');
-const touchArea = document.getElementById('touch-area'); // Note: hyphen in id
+const touchArea = document.getElementById('touch-area');
 
-// Set canvas size
 function resizeCanvas() {
     const dpr = window.devicePixelRatio || 1;
     canvas.width = canvas.clientWidth * dpr;
     canvas.height = canvas.clientHeight * dpr;
     ctx.scale(dpr, dpr);
 
-    // Update ship position to center
     ship.x = canvas.clientWidth / 2;
     ship.y = canvas.clientHeight / 2;
-    console.log('Canvas resized:', canvas.width, canvas.height); // Debug: Check canvas size
+    console.log('Canvas resized:', canvas.width, canvas.height);
 }
 
 resizeCanvas();
@@ -41,8 +38,8 @@ let lastFrameTime = performance.now();
 const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
+const ENEMY_SPAWN_RATE = 0.02 * level; // Ensure spawn rate is accessible
 
-// Input handling
 let isTouching = false;
 let touchX = 0;
 
@@ -60,9 +57,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') shipAngle -= 0.1;
 });
 
-// Game loop
 function update(deltaTime) {
-    // Update timer
     timeLeft -= deltaTime / 1000;
     document.getElementById('timer').textContent = Math.ceil(timeLeft);
 
@@ -70,7 +65,6 @@ function update(deltaTime) {
         levelUp();
     }
 
-    // Rotate ship based on touch
     if (isTouching) {
         const touchZoneWidth = touchArea.clientWidth;
         shipAngle = -((touchX / touchZoneWidth) - 0.5) * Math.PI * 2;
@@ -86,15 +80,17 @@ function update(deltaTime) {
         });
     }
 
-    // Spawn enemies
-    if (Math.random() < 0.02 * level) {
+    // Spawn enemies with debug log
+    if (Math.random() < ENEMY_SPAWN_RATE) {
         const angle = Math.random() * Math.PI * 2;
         const spawnDistance = Math.max(canvas.width, canvas.height);
-        enemies.push({
+        const enemy = {
             x: ship.x + Math.cos(angle) * spawnDistance,
             y: ship.y + Math.sin(angle) * spawnDistance,
             speed: 1 + level * 0.5,
-        });
+        };
+        enemies.push(enemy);
+        console.log('Enemy spawned at:', enemy.x, enemy.y); // Debug enemy spawn
     }
 
     // Update projectiles
@@ -114,7 +110,6 @@ function update(deltaTime) {
         e.x += (dx / dist) * e.speed;
         e.y += (dy / dist) * e.speed;
 
-        // Collision with ship
         if (dist < ship.radius + ENEMY_SIZE) {
             enemies.splice(i, 1);
             shields--;
@@ -122,7 +117,6 @@ function update(deltaTime) {
             if (shields <= 0) gameOver();
         }
 
-        // Collision with projectiles
         projectiles.forEach((p, pi) => {
             if (Math.hypot(p.x - e.x, p.y - e.y) < ENEMY_SIZE) {
                 enemies.splice(i, 1);
@@ -135,7 +129,6 @@ function update(deltaTime) {
 }
 
 function draw() {
-    console.log('Drawing frame'); // Debug: Check if draw is called
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw ship
@@ -170,7 +163,6 @@ function draw() {
 
 function gameLoop(currentTime) {
     try {
-        console.log('Game loop running'); // Debug: Check if loop is running
         const deltaTime = currentTime - lastFrameTime;
         lastFrameTime = currentTime;
 
