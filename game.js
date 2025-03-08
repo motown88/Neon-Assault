@@ -1,3 +1,10 @@
+// Declare ship before resizeCanvas
+const ship = {
+    x: 0, // Will be set in resizeCanvas
+    y: 0,
+    radius: 20,
+};
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const touchArea = document.getElementById('touchArea');
@@ -30,13 +37,6 @@ let lastFrameTime = performance.now();
 const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
-
-// Ship object
-const ship = {
-    x: 0, // Set in resizeCanvas
-    y: 0,
-    radius: SHIP_SIZE,
-};
 
 // Input handling
 let isTouching = false;
