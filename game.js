@@ -30,15 +30,16 @@ let shipAngle = 0;
 let shields = 3;
 let score = 0;
 let level = 1;
-let timeLeft = 15; // Start with 15 seconds for Level 1
+let timeLeft = 15;
 let enemies = [];
 let projectiles = [];
 let lastFrameTime = performance.now();
+let spawnWedgeStartAngle = Math.random() * Math.PI * 2; // Random starting angle for the wedge
 
 const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
-const BASE_ENEMY_SPAWN_RATE = 0.02; // Base rate, independent of level for Level 1
+const BASE_ENEMY_SPAWN_RATE = 0.02;
 
 let isTouching = false;
 let touchX = 0;
@@ -46,15 +47,15 @@ let touchX = 0;
 touchArea.addEventListener('touchstart', (e) => {
     isTouching = true;
     touchX = e.touches[0].clientX;
-    console.log('Touch started at:', touchX); // Debug touch start
+    console.log('Touch started at:', touchX);
 });
 touchArea.addEventListener('touchmove', (e) => {
     touchX = e.touches[0].clientX;
-    console.log('Touch moved to:', touchX); // Debug touch move
+    console.log('Touch moved to:', touchX);
 });
 touchArea.addEventListener('touchend', () => {
     isTouching = false;
-    console.log('Touch ended'); // Debug touch end
+    console.log('Touch ended');
 });
 
 document.addEventListener('keydown', (e) => {
@@ -70,10 +71,14 @@ function update(deltaTime) {
         levelUp();
     }
 
+    // Increase touch sensitivity: complete a full rotation with smaller movement
     if (isTouching) {
         const touchZoneWidth = touchArea.clientWidth;
-        shipAngle = -((touchX / touchZoneWidth) - 0.5) * Math.PI * 2;
-        console.log('Ship angle updated to:', shipAngle); // Debug rotation
+        // Map touch position (0 to touchZoneWidth) to a larger angle change
+        // Previously: full width = 2π (360 degrees)
+        // Now: half width = 2π (so full width = 4π, doubling sensitivity)
+        shipAngle = -((touchX / touchZoneWidth) - 0.5) * Math.PI * 4; // Doubled sensitivity
+        console.log('Ship angle updated to:', shipAngle);
     }
 
     // Auto-fire projectiles
@@ -86,18 +91,22 @@ function update(deltaTime) {
         });
     }
 
-    // Spawn enemies with base rate for Level 1, scaled by level
-    const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (level > 1 ? level : 1); // Ensure Level 1 has spawns
+    // Calculate spawn angle range based on level
+    const maxAngleRange = Math.min((Math.PI / 2) * level, Math.PI * 2); // 90 degrees per level, max 360 degrees
+    const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (1 + (level - 1) * 0.5); // Slower progression
+
+    // Spawn enemies within the angle range
     if (Math.random() < effectiveSpawnRate) {
-        const angle = Math.random() * Math.PI * 2;
+        const angleRange = maxAngleRange / 2; // Half range on either side of start angle
+        const angle = spawnWedgeStartAngle + (Math.random() * maxAngleRange - angleRange);
         const spawnDistance = canvas.width * 0.7;
         const enemy = {
             x: ship.x + Math.cos(angle) * spawnDistance,
             y: ship.y + Math.sin(angle) * spawnDistance,
-            speed: 1 + (level - 1) * 0.5, // Slower at Level 1
+            speed: 1 + (level - 1) * 0.5,
         };
         enemies.push(enemy);
-        console.log('Enemy spawned at:', enemy.x, enemy.y, 'with speed:', enemy.speed);
+        console.log('Enemy spawned at:', enemy.x, enemy.y, 'with speed:', enemy.speed, 'angle:', angle);
     }
 
     // Update projectiles
@@ -161,7 +170,7 @@ function draw() {
     });
 
     // Draw enemies with neon effect
-    ctx.fillStyle = '#ff00ff'; // Bright neon magenta
+    ctx.fillStyle = '#ff00ff';
     ctx.shadowBlur = 10;
     ctx.shadowColor = '#ff00ff';
     enemies.forEach(e => {
@@ -169,7 +178,7 @@ function draw() {
         ctx.arc(e.x, e.y, ENEMY_SIZE, 0, Math.PI * 2);
         ctx.fill();
     });
-    ctx.shadowBlur = 0; // Reset shadow
+    ctx.shadowBlur = 0;
 }
 
 function gameLoop(currentTime) {
@@ -187,9 +196,12 @@ function gameLoop(currentTime) {
 
 function levelUp() {
     level++;
-    timeLeft = 30; // 30 seconds for levels after 1
+    timeLeft = 30;
     document.getElementById('level').textContent = level;
     document.getElementById('timer').textContent = timeLeft;
+    // Change the wedge start angle for the new level
+    spawnWedgeStartAngle = Math.random() * Math.PI * 2;
+    console.log('Level up! New wedge start angle:', spawnWedgeStartAngle);
 }
 
 function gameOver() {
@@ -197,9 +209,10 @@ function gameOver() {
     shields = 3;
     score = 0;
     level = 1;
-    timeLeft = 15; // Reset to 15 seconds for Level 1
+    timeLeft = 15;
     enemies = [];
     projectiles = [];
+    spawnWedgeStartAngle = Math.random() * Math.PI * 2;
     document.getElementById('shields').textContent = shields;
     document.getElementById('score').textContent = score;
     document.getElementById('level').textContent = level;
