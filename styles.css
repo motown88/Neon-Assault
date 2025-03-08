@@ -32,27 +32,27 @@ body {
     top: 10px;
     left: 10px;
     color: #00ffff;
-    font-size: 14px; /* Slightly smaller for better fit */
+    font-size: 14px;
     z-index: 20;
     text-shadow: 0 0 5px #00ffff;
-    line-height: 1.2; /* Reduce space between lines */
+    line-height: 1.2;
 }
 
 #ui p {
-    margin: 2px 0; /* Minimal spacing between UI elements */
+    margin: 2px 0;
 }
 
 #touch-area {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 10%; /* Reduced from 20% to 10% */
-    background: black; /* Change to black */
+    height: 10%;
+    background: black;
     z-index: 10;
     pointer-events: auto;
 }
 
-/* Add a horizontal line with arrows and "Spin" */
+/* Fix horizontal line with "Spin" */
 #touch-area::after {
     content: "← Spin →";
     position: absolute;
@@ -60,9 +60,11 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     color: #00ffff;
-    text-shadow: 0 0 5px #00ffff;
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; /* Enhanced neon glow */
     font-size: 16px;
     white-space: nowrap;
+    border: none; /* Remove any default borders */
+    background: none; /* Ensure no background interferes */
 }
 
 @media (min-width: 768px) {
@@ -72,12 +74,12 @@ body {
     }
 
     #touch-area {
-        display: none; /* Hide touch area on desktop */
+        display: none;
     }
 }
 
 @media (max-width: 480px) {
     #ui {
-        font-size: 12px; /* Even smaller on very small screens */
+        font-size: 12px;
     }
 }
