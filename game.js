@@ -3,8 +3,19 @@ const ctx = canvas.getContext('2d');
 const touchArea = document.getElementById('touchArea');
 
 // Set canvas size
-canvas.width = canvas.clientWidth;
-canvas.height = canvas.clientHeight;
+function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Update ship position to center
+    ship.x = canvas.clientWidth / 2;
+    ship.y = canvas.clientHeight / 2;
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
 let shipAngle = 0;
 let shields = 3;
@@ -21,8 +32,8 @@ const PROJECTILE_SPEED = 5;
 
 // Ship object
 const ship = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
+    x: 0, // Set in resizeCanvas
+    y: 0,
     radius: SHIP_SIZE,
 };
 
@@ -152,12 +163,16 @@ function draw() {
 }
 
 function gameLoop(currentTime) {
-    const deltaTime = currentTime - lastFrameTime;
-    lastFrameTime = currentTime;
+    try {
+        const deltaTime = currentTime - lastFrameTime;
+        lastFrameTime = currentTime;
 
-    update(deltaTime);
-    draw();
-    requestAnimationFrame(gameLoop);
+        update(deltaTime);
+        draw();
+        requestAnimationFrame(gameLoop);
+    } catch (error) {
+        console.error('Error in game loop:', error);
+    }
 }
 
 function levelUp() {
