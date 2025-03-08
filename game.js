@@ -30,7 +30,7 @@ let shipAngle = 0;
 let shields = 3;
 let score = 0;
 let level = 1;
-let timeLeft = 30;
+let timeLeft = 15; // Start with 15 seconds for Level 1
 let enemies = [];
 let projectiles = [];
 let lastFrameTime = performance.now();
@@ -38,7 +38,7 @@ let lastFrameTime = performance.now();
 const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
-const ENEMY_SPAWN_RATE = 0.02 * level; // Ensure spawn rate is accessible
+const BASE_ENEMY_SPAWN_RATE = 0.02; // Base rate, independent of level for Level 1
 
 let isTouching = false;
 let touchX = 0;
@@ -46,11 +46,16 @@ let touchX = 0;
 touchArea.addEventListener('touchstart', (e) => {
     isTouching = true;
     touchX = e.touches[0].clientX;
+    console.log('Touch started at:', touchX); // Debug touch start
 });
 touchArea.addEventListener('touchmove', (e) => {
     touchX = e.touches[0].clientX;
+    console.log('Touch moved to:', touchX); // Debug touch move
 });
-touchArea.addEventListener('touchend', () => isTouching = false);
+touchArea.addEventListener('touchend', () => {
+    isTouching = false;
+    console.log('Touch ended'); // Debug touch end
+});
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') shipAngle += 0.1;
@@ -68,6 +73,7 @@ function update(deltaTime) {
     if (isTouching) {
         const touchZoneWidth = touchArea.clientWidth;
         shipAngle = -((touchX / touchZoneWidth) - 0.5) * Math.PI * 2;
+        console.log('Ship angle updated to:', shipAngle); // Debug rotation
     }
 
     // Auto-fire projectiles
@@ -80,17 +86,18 @@ function update(deltaTime) {
         });
     }
 
-    // Spawn enemies with debug log
-    if (Math.random() < ENEMY_SPAWN_RATE) {
+    // Spawn enemies with base rate for Level 1, scaled by level
+    const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (level > 1 ? level : 1); // Ensure Level 1 has spawns
+    if (Math.random() < effectiveSpawnRate) {
         const angle = Math.random() * Math.PI * 2;
-        const spawnDistance = Math.max(canvas.width, canvas.height);
+        const spawnDistance = canvas.width * 0.7;
         const enemy = {
             x: ship.x + Math.cos(angle) * spawnDistance,
             y: ship.y + Math.sin(angle) * spawnDistance,
-            speed: 1 + level * 0.5,
+            speed: 1 + (level - 1) * 0.5, // Slower at Level 1
         };
         enemies.push(enemy);
-        console.log('Enemy spawned at:', enemy.x, enemy.y); // Debug enemy spawn
+        console.log('Enemy spawned at:', enemy.x, enemy.y, 'with speed:', enemy.speed);
     }
 
     // Update projectiles
@@ -109,6 +116,7 @@ function update(deltaTime) {
         const dist = Math.sqrt(dx * dx + dy * dy);
         e.x += (dx / dist) * e.speed;
         e.y += (dy / dist) * e.speed;
+        console.log('Enemy at:', e.x, e.y, 'distance to ship:', dist);
 
         if (dist < ship.radius + ENEMY_SIZE) {
             enemies.splice(i, 1);
@@ -152,13 +160,16 @@ function draw() {
         ctx.fill();
     });
 
-    // Draw enemies
-    ctx.fillStyle = '#ff0000';
+    // Draw enemies with neon effect
+    ctx.fillStyle = '#ff00ff'; // Bright neon magenta
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ff00ff';
     enemies.forEach(e => {
         ctx.beginPath();
         ctx.arc(e.x, e.y, ENEMY_SIZE, 0, Math.PI * 2);
         ctx.fill();
     });
+    ctx.shadowBlur = 0; // Reset shadow
 }
 
 function gameLoop(currentTime) {
@@ -176,7 +187,7 @@ function gameLoop(currentTime) {
 
 function levelUp() {
     level++;
-    timeLeft = 30;
+    timeLeft = 30; // 30 seconds for levels after 1
     document.getElementById('level').textContent = level;
     document.getElementById('timer').textContent = timeLeft;
 }
@@ -186,7 +197,7 @@ function gameOver() {
     shields = 3;
     score = 0;
     level = 1;
-    timeLeft = 30;
+    timeLeft = 15; // Reset to 15 seconds for Level 1
     enemies = [];
     projectiles = [];
     document.getElementById('shields').textContent = shields;
