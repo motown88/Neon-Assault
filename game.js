@@ -12,6 +12,7 @@ function resizeCanvas() {
     // Update ship position to center
     ship.x = canvas.clientWidth / 2;
     ship.y = canvas.clientHeight / 2;
+    console.log('Canvas resized:', canvas.width, canvas.height); // Debug: Check canvas size
 }
 
 resizeCanvas();
@@ -130,6 +131,7 @@ function update(deltaTime) {
 }
 
 function draw() {
+    console.log('Drawing frame'); // Debug: Check if draw is called
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw ship
@@ -164,6 +166,7 @@ function draw() {
 
 function gameLoop(currentTime) {
     try {
+        console.log('Game loop running'); // Debug: Check if loop is running
         const deltaTime = currentTime - lastFrameTime;
         lastFrameTime = currentTime;
 
