@@ -2,6 +2,7 @@ const ship = {
     x: 0,
     y: 0,
     radius: 20,
+    speed: 5, // Movement speed
 };
 
 const canvas = document.getElementById('gameCanvas');
@@ -10,7 +11,8 @@ if (!canvas) {
     throw new Error('Canvas not found');
 }
 const ctx = canvas.getContext('2d');
-const touchArea = document.getElementById('touch-area');
+const touchSpin = document.getElementById('touch-spin');
+const joystick = document.getElementById('joystick');
 const upgradeScreen = document.getElementById('upgrade-screen');
 const upgradeButtons = [
     document.getElementById('upgrade1'),
@@ -50,10 +52,13 @@ const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
 const BASE_ENEMY_SPAWN_RATE = 0.02;
 
-let isTouching = false;
-let touchX = 0;
+let isTouchingSpin = false;
+let touchYSpin = 0;
+let isTouchingJoystick = false;
+let joystickTouchX = 0;
+let joystickTouchY = 0;
 
-// Define 30 upgrades
+// Define 30 upgrades (unchanged from previous)
 const upgrades = [
     // Shield Upgrades
     { name: "Shield Boost", type: "shields", value: 1, rarity: "Common", description: "+1 Shield" },
@@ -98,7 +103,6 @@ function getRandomUpgrades() {
 }
 
 function showUpgradeScreen() {
-    isPaused = true;
     upgradeScreen.style.display = 'flex';
     const selectedUpgrades = getRandomUpgrades();
 
@@ -108,8 +112,7 @@ function showUpgradeScreen() {
         button.onclick = () => {
             applyUpgrade(upgrade);
             upgradeScreen.style.display = 'none';
-            isPaused = false;
-            levelUp();
+            levelUp(); // Immediate level start
             requestAnimationFrame(gameLoop);
         };
     });
@@ -128,23 +131,60 @@ function applyUpgrade(upgrade) {
     console.log('Applied upgrade:', upgrade.name, 'New state:', { shields, fireRate, fireDirections });
 }
 
-touchArea.addEventListener('touchstart', (e) => {
-    isTouching = true;
-    touchX = e.touches[0].clientX;
-    console.log('Touch started at:', touchX);
+touchSpin.addEventListener('touchstart', (e) => {
+    isTouchingSpin = true;
+    touchYSpin = e.touches[0].clientY;
+    console.log('Spin touch started at:', touchYSpin);
 });
-touchArea.addEventListener('touchmove', (e) => {
-    touchX = e.touches[0].clientX;
-    console.log('Touch moved to:', touchX);
+touchSpin.addEventListener('touchmove', (e) => {
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - touchYSpin;
+    // Increase sensitivity: full height = 2π (360 degrees)
+    shipAngle = deltaY / touchSpin.clientHeight * Math.PI * 2;
+    touchYSpin = currentY;
+    console.log('Spin angle updated to:', shipAngle);
 });
-touchArea.addEventListener('touchend', () => {
-    isTouching = false;
-    console.log('Touch ended');
+touchSpin.addEventListener('touchend', () => {
+    isTouchingSpin = false;
+    console.log('Spin touch ended');
+});
+
+joystick.addEventListener('touchstart', (e) => {
+    isTouchingJoystick = true;
+    joystickTouchX = e.touches[0].clientX - joystick.getBoundingClientRect().left;
+    joystickTouchY = e.touches[0].clientY - joystick.getBoundingClientRect().top;
+    console.log('Joystick touch started at:', joystickTouchX, joystickTouchY);
+});
+joystick.addEventListener('touchmove', (e) => {
+    if (isTouchingJoystick) {
+        const rect = joystick.getBoundingClientRect();
+        const currentX = e.touches[0].clientX - rect.left;
+        const currentY = e.touches[0].clientY - rect.top;
+        const deltaX = (currentX - joystickTouchX) / joystick.clientWidth * 2; // High sensitivity
+        const deltaY = (currentY - joystickTouchY) / joystick.clientHeight * 2; // High sensitivity
+        ship.x += deltaX * ship.speed * 10; // Amplify movement
+        ship.y += deltaY * ship.speed * 10;
+        // Keep ship within canvas bounds
+        ship.x = Math.max(SHIP_SIZE, Math.min(canvas.width - SHIP_SIZE, ship.x));
+        ship.y = Math.max(SHIP_SIZE, Math.min(canvas.height - SHIP_SIZE, ship.y));
+        joystickTouchX = currentX;
+        joystickTouchY = currentY;
+        console.log('Ship moved to:', ship.x, ship.y);
+    }
+});
+joystick.addEventListener('touchend', () => {
+    isTouchingJoystick = false;
+    console.log('Joystick touch ended');
 });
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') shipAngle += 0.1;
     if (e.key === 'ArrowRight') shipAngle -= 0.1;
+    if (e.key === 'ArrowUp') ship.y -= ship.speed;
+    if (e.key === 'ArrowDown') ship.y += ship.speed;
+    // Keep ship within bounds
+    ship.x = Math.max(SHIP_SIZE, Math.min(canvas.width - SHIP_SIZE, ship.x));
+    ship.y = Math.max(SHIP_SIZE, Math.min(canvas.height - SHIP_SIZE, ship.y));
 });
 
 function update(deltaTime) {
@@ -156,12 +196,6 @@ function update(deltaTime) {
     if (timeLeft <= 0) {
         showUpgradeScreen();
         return;
-    }
-
-    if (isTouching) {
-        const touchZoneWidth = touchArea.clientWidth;
-        shipAngle = -((touchX / touchZoneWidth) - 0.5) * Math.PI * 4;
-        console.log('Ship angle updated to:', shipAngle);
     }
 
     if (Math.random() < fireRate) {
@@ -295,6 +329,8 @@ function gameOver() {
     fireRate = 0.1;
     fireDirections = [{ angle: 0 }];
     spawnWedgeStartAngle = Math.random() * Math.PI * 2;
+    ship.x = canvas.clientWidth / 2;
+    ship.y = canvas.clientHeight / 2;
     document.getElementById('shields').textContent = shields;
     document.getElementById('score').textContent = score;
     document.getElementById('level').textContent = level;
