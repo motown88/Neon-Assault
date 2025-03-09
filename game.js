@@ -157,6 +157,7 @@ function update(deltaTime) {
         document.getElementById('timer').textContent = Math.ceil(timeLeft);
 
         if (timeLeft <= 0) {
+            enemies = []; // Clear enemies at the end of the level
             showUpgradeScreen();
         }
 
@@ -205,7 +206,7 @@ function update(deltaTime) {
         }
 
         const maxAngleRange = Math.min((Math.PI / 2) * level, Math.PI * 2);
-        const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (1 + (level - 1) * 0.5);
+        const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (1 + (level - 1) * 0.3); // Slower progression: Changed from 0.5 to 0.3
 
         if (Math.random() < effectiveSpawnRate) {
             const angleRange = maxAngleRange / 2;
@@ -273,16 +274,18 @@ function draw() {
     ctx.closePath();
     ctx.fill();
 
-    // Draw shield outlines
+    // Draw shield outlines with enhanced effect
     if (shields > 0) {
-        ctx.strokeStyle = '#00ffff'; // Same cyan color as the ship
-        ctx.lineWidth = 2; // Thickness of each shield outline
-        ctx.shadowBlur = 10; // Glow effect
-        ctx.shadowColor = '#00ffff'; // Cyan glow to match the ship
+        ctx.strokeStyle = '#00ffff'; // Cyan color for shields
+        ctx.lineWidth = 3; // Thicker outline for better visibility
+        ctx.shadowBlur = 15; // Increased glow effect
+        ctx.shadowColor = '#00ffff'; // Cyan glow
 
         // Draw one outline for each shield
         for (let i = 0; i < shields; i++) {
-            const scaleFactor = 1 + (i * 0.1); // Increase size by 10% per shield
+            const scaleFactor = 1 + (i * 0.15); // Increased spacing (was 0.1, now 0.15)
+            const opacity = 1 - (i * 0.05); // Slight fade for outer shields (1 to 0.5)
+            ctx.globalAlpha = opacity; // Apply opacity to make outer shields fainter
             ctx.beginPath();
             ctx.moveTo(SHIP_SIZE * scaleFactor, 0);
             ctx.lineTo(-SHIP_SIZE / 2 * scaleFactor, SHIP_SIZE / 2 * scaleFactor);
@@ -291,7 +294,8 @@ function draw() {
             ctx.stroke();
         }
 
-        // Reset shadow for other drawings
+        // Reset global alpha and shadow for other drawings
+        ctx.globalAlpha = 1;
         ctx.shadowBlur = 0;
     }
 
@@ -367,7 +371,9 @@ function applyUpgrade(upgrade) {
 
 function levelUp() {
     level++;
-    timeLeft = 30;
+    timeLeft = 15; // All levels are now 15 seconds (changed from 30)
+    ship.x = canvas.clientWidth / 2; // Reset ship to center
+    ship.y = canvas.clientHeight / 2; // Reset ship to center
     document.getElementById('level').textContent = level;
     document.getElementById('timer').textContent = timeLeft;
     spawnWedgeStartAngle = Math.random() * Math.PI * 2;
@@ -385,6 +391,8 @@ function gameOver() {
     fireRate = 0.1;
     fireDirections = [{ angle: 0 }];
     spawnWedgeStartAngle = Math.random() * Math.PI * 2;
+    ship.x = canvas.clientWidth / 2; // Reset ship to center on game over
+    ship.y = canvas.clientHeight / 2; // Reset ship to center on game over
     document.getElementById('shields').textContent = shields;
     document.getElementById('score').textContent = score;
     document.getElementById('level').textContent = level;
