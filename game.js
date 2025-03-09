@@ -245,4 +245,159 @@ function update(deltaTime) {
             }
 
             projectiles.forEach((p, pi) => {
-                if (Math.hypot(p.x - e.x, p.y - e.y) < ENEMY_SIZE) {​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+                if (Math.hypot(p.x - e.x, p.y - e.y) < ENEMY_SIZE) {
+                    enemies.splice(i, 1);
+                    projectiles.splice(pi, 1);
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                }
+            });
+        });
+    }
+}
+
+function draw() {
+    console.log('Draw called');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw ship and shields
+    ctx.save();
+    ctx.translate(ship.x, ship.y);
+    ctx.rotate(shipAngle);
+
+    // Draw the ship (filled triangle)
+    ctx.fillStyle = '#00ffff';
+    ctx.beginPath();
+    ctx.moveTo(SHIP_SIZE, 0);
+    ctx.lineTo(-SHIP_SIZE / 2, SHIP_SIZE / 2);
+    ctx.lineTo(-SHIP_SIZE / 2, -SHIP_SIZE / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw shield outlines with enhanced effect
+    if (shields > 0) {
+        ctx.strokeStyle = '#00ffff'; // Cyan color for shields
+        ctx.lineWidth = 3; // Thicker outline for better visibility
+        ctx.shadowBlur = 15; // Increased glow effect
+        ctx.shadowColor = '#00ffff'; // Cyan glow
+
+        // Draw one outline for each shield
+        for (let i = 0; i < shields; i++) {
+            const scaleFactor = 1 + (i * 0.15); // Increased spacing
+            const opacity = 1 - (i * 0.05); // Slight fade for outer shields (1 to 0.5)
+            ctx.globalAlpha = opacity; // Apply opacity to make outer shields fainter
+            ctx.beginPath();
+            ctx.moveTo(SHIP_SIZE * scaleFactor, 0);
+            ctx.lineTo(-SHIP_SIZE / 2 * scaleFactor, SHIP_SIZE / 2 * scaleFactor);
+            ctx.lineTo(-SHIP_SIZE / 2 * scaleFactor, -SHIP_SIZE / 2 * scaleFactor);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        // Reset global alpha and shadow for other drawings
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+    }
+
+    ctx.restore();
+
+    // Draw projectiles
+    ctx.fillStyle = '#ffff00';
+    projectiles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Draw enemies with neon effect
+    ctx.fillStyle = '#ff00ff';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ff00ff';
+    enemies.forEach(e => {
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, ENEMY_SIZE, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+}
+
+function gameLoop(currentTime) {
+    try {
+        console.log('Game loop running, isPaused:', isPaused);
+        const deltaTime = currentTime - lastFrameTime;
+        lastFrameTime = currentTime;
+
+        update(deltaTime);
+        draw();
+        requestAnimationFrame(gameLoop);
+    } catch (error) {
+        console.error('Error in game loop:', error);
+    }
+}
+
+function showUpgradeScreen() {
+    isPaused = true;
+    upgradeScreen.style.display = 'flex';
+    const availableUpgrades = [];
+    while (availableUpgrades.length < 3) {
+        const upgrade = upgrades[Math.floor(Math.random() * upgrades.length)];
+        if (!availableUpgrades.includes(upgrade)) availableUpgrades.push(upgrade);
+    }
+
+    upgradeButtons.forEach((button, index) => {
+        const upgrade = availableUpgrades[index];
+        button.textContent = `${upgrade.name} (${upgrade.rarity})\n${upgrade.description}`;
+        button.onclick = () => applyUpgrade(upgrade);
+    });
+}
+
+function applyUpgrade(upgrade) {
+    switch (upgrade.type) {
+        case 'shields':
+            shields += upgrade.value;
+            break;
+        case 'fireRate':
+            fireRate += upgrade.value;
+            break;
+        case 'fireDirection':
+            fireDirections = fireDirections.concat(upgrade.value);
+            break;
+    }
+    document.getElementById('shields').textContent = shields;
+    upgradeScreen.style.display = 'none';
+    isPaused = false;
+    levelUp();
+}
+
+function levelUp() {
+    level++;
+    timeLeft = 15; // All levels are now 15 seconds
+    ship.x = canvas.clientWidth / 2; // Reset ship to center
+    ship.y = canvas.clientHeight / 2; // Reset ship to center
+    document.getElementById('level').textContent = level;
+    document.getElementById('timer').textContent = timeLeft;
+    spawnWedgeStartAngle = Math.random() * Math.PI * 2;
+    console.log('Level up! New wedge start angle:', spawnWedgeStartAngle);
+}
+
+function gameOver() {
+    alert(`Game Over! Score: ${score}`);
+    shields = 3;
+    score = 0;
+    level = 1;
+    timeLeft = 15;
+    enemies = [];
+    projectiles = [];
+    fireRate = 0.1;
+    fireDirections = [{ angle: 0 }];
+    spawnWedgeStartAngle = Math.random() * Math.PI * 2;
+    ship.x = canvas.clientWidth / 2; // Reset ship to center on game over
+    ship.y = canvas.clientHeight / 2; // Reset ship to center on game over
+    document.getElementById('shields').textContent = shields;
+    document.getElementById('score').textContent = score;
+    document.getElementById('level').textContent = level;
+    document.getElementById('timer').textContent = timeLeft;
+    isPaused = false;
+}
+
+requestAnimationFrame(gameLoop);
