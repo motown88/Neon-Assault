@@ -15,6 +15,10 @@ if (!ctx) {
     throw new Error('Canvas context not initialized');
 }
 const touchArea = document.getElementById('touch-area');
+if (!touchArea) {
+    console.error('Touch area element not found! Check the id in index.html.');
+    throw new Error('Touch area not found');
+}
 const upgradeScreen = document.getElementById('upgrade-screen');
 const upgradeButtons = [
     document.getElementById('upgrade1'),
@@ -45,7 +49,7 @@ let enemies = [];
 let projectiles = [];
 let lastFrameTime = performance.now();
 let spawnWedgeStartAngle = Math.random() * Math.PI * 2;
-let isPaused = false; // Ensure not paused at start
+let isPaused = false;
 let fireRate = 0.1;
 let fireDirections = [{ angle: 0 }];
 
@@ -57,9 +61,8 @@ const BASE_ENEMY_SPAWN_RATE = 0.02;
 let isTouching = false;
 let touchX = 0;
 
-console.log('Game initialized. isPaused:', isPaused); // Debug initial state
+console.log('Game initialized. isPaused:', isPaused);
 
-// Define 30 upgrades
 const upgrades = [
     // Shield Upgrades
     { name: "Shield Boost", type: "shields", value: 1, rarity: "Common", description: "+1 Shield" },
@@ -119,7 +122,7 @@ document.addEventListener('keydown', (e) => {
 
 function update(deltaTime) {
     if (!isPaused) {
-        console.log('Update called, deltaTime:', deltaTime); // Debug update
+        console.log('Update called, deltaTime:', deltaTime);
         timeLeft -= deltaTime / 1000;
         document.getElementById('timer').textContent = Math.ceil(timeLeft);
 
@@ -138,7 +141,7 @@ function update(deltaTime) {
                 projectiles.push({
                     x: ship.x,
                     y: ship.y,
-                    dx: Math.cos(shipAngle + dir.angle * (Math.PI / 180)) * PROJECTILE_SPEED, // Convert degrees to radians
+                    dx: Math.cos(shipAngle + dir.angle * (Math.PI / 180)) * PROJECTILE_SPEED,
                     dy: Math.sin(shipAngle + dir.angle * (Math.PI / 180)) * PROJECTILE_SPEED,
                 });
             });
@@ -196,7 +199,7 @@ function update(deltaTime) {
 }
 
 function draw() {
-    console.log('Draw called'); // Debug draw
+    console.log('Draw called');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw ship
@@ -234,7 +237,7 @@ function draw() {
 
 function gameLoop(currentTime) {
     try {
-        console.log('Game loop running, isPaused:', isPaused); // Debug game loop
+        console.log('Game loop running, isPaused:', isPaused);
         const deltaTime = currentTime - lastFrameTime;
         lastFrameTime = currentTime;
 
