@@ -259,10 +259,12 @@ function draw() {
     console.log('Draw called');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw ship
+    // Draw ship and shields
     ctx.save();
     ctx.translate(ship.x, ship.y);
     ctx.rotate(shipAngle);
+
+    // Draw the ship (filled triangle)
     ctx.fillStyle = '#00ffff';
     ctx.beginPath();
     ctx.moveTo(SHIP_SIZE, 0);
@@ -270,6 +272,29 @@ function draw() {
     ctx.lineTo(-SHIP_SIZE / 2, -SHIP_SIZE / 2);
     ctx.closePath();
     ctx.fill();
+
+    // Draw shield outlines
+    if (shields > 0) {
+        ctx.strokeStyle = '#00ffff'; // Same cyan color as the ship
+        ctx.lineWidth = 2; // Thickness of each shield outline
+        ctx.shadowBlur = 10; // Glow effect
+        ctx.shadowColor = '#00ffff'; // Cyan glow to match the ship
+
+        // Draw one outline for each shield
+        for (let i = 0; i < shields; i++) {
+            const scaleFactor = 1 + (i * 0.1); // Increase size by 10% per shield
+            ctx.beginPath();
+            ctx.moveTo(SHIP_SIZE * scaleFactor, 0);
+            ctx.lineTo(-SHIP_SIZE / 2 * scaleFactor, SHIP_SIZE / 2 * scaleFactor);
+            ctx.lineTo(-SHIP_SIZE / 2 * scaleFactor, -SHIP_SIZE / 2 * scaleFactor);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        // Reset shadow for other drawings
+        ctx.shadowBlur = 0;
+    }
+
     ctx.restore();
 
     // Draw projectiles
