@@ -169,14 +169,19 @@ function update(deltaTime) {
             console.log('Ship angle updated to:', shipAngle);
         }
 
-        // Move control with increased sensitivity
+        // Move control with increased sensitivity (corrected for local coordinates)
         if (isTouchingMove) {
-            const moveZoneHeight = moveArea.clientHeight;
-            const moveZoneWidth = moveArea.clientWidth;
-            const centerX = moveZoneWidth / 2;
-            const centerY = moveZoneHeight / 2;
-            const touchOffsetX = ((touchXMove - centerX) / centerX) * MOVE_SENSITIVITY; // Amplify with sensitivity
-            const touchOffsetY = ((touchYMove - centerY) / centerY) * MOVE_SENSITIVITY; // Amplify with sensitivity
+            const moveAreaRect = moveArea.getBoundingClientRect();
+            const moveZoneWidth = moveAreaRect.width;
+            const moveZoneHeight = moveAreaRect.height;
+            const centerX = moveAreaRect.left + moveZoneWidth / 2;
+            const centerY = moveAreaRect.top + moveZoneHeight / 2;
+
+            // Calculate touch offset relative to the center of move-area
+            const touchOffsetX = ((touchXMove - centerX) / (moveZoneWidth / 2)) * MOVE_SENSITIVITY;
+            const touchOffsetY = ((touchYMove - centerY) / (moveZoneHeight / 2)) * MOVE_SENSITIVITY;
+
+            // Update ship position
             ship.x += touchOffsetX * MOVE_SPEED;
             ship.y += touchOffsetY * MOVE_SPEED;
 
@@ -185,7 +190,7 @@ function update(deltaTime) {
             const visibleHeight = canvas.clientHeight;
             ship.x = Math.max(SHIP_SIZE, Math.min(visibleWidth - SHIP_SIZE, ship.x));
             ship.y = Math.max(SHIP_SIZE, Math.min(visibleHeight - SHIP_SIZE, ship.y));
-            console.log('Ship moved to:', ship.x, ship.y, 'Visible area:', visibleWidth, visibleHeight);
+            console.log('Ship moved to:', ship.x, ship.y, 'Touch offset:', touchOffsetX, touchOffsetY);
         }
 
         if (Math.random() < fireRate) {
