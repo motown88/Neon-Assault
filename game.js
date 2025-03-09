@@ -206,7 +206,7 @@ function update(deltaTime) {
         }
 
         const maxAngleRange = Math.min((Math.PI / 2) * level, Math.PI * 2);
-        const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (1 + (level - 1) * 0.3); // Slower progression
+        const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (1 + (level - 1) * 0.3); // Slower progression: Changed from 0.5 to 0.3
 
         if (Math.random() < effectiveSpawnRate) {
             const angleRange = maxAngleRange / 2;
@@ -283,7 +283,7 @@ function draw() {
 
         // Draw one outline for each shield
         for (let i = 0; i < shields; i++) {
-            const scaleFactor = 1 + (i * 0.15); // Increased spacing
+            const scaleFactor = 1 + (i * 0.15); // Increased spacing (was 0.1, now 0.15)
             const opacity = 1 - (i * 0.05); // Slight fade for outer shields (1 to 0.5)
             ctx.globalAlpha = opacity; // Apply opacity to make outer shields fainter
             ctx.beginPath();
@@ -371,7 +371,7 @@ function applyUpgrade(upgrade) {
 
 function levelUp() {
     level++;
-    timeLeft = 15; // All levels are now 15 seconds
+    timeLeft = 15; // All levels are now 15 seconds (changed from 30)
     ship.x = canvas.clientWidth / 2; // Reset ship to center
     ship.y = canvas.clientHeight / 2; // Reset ship to center
     document.getElementById('level').textContent = level;
