@@ -10,6 +10,10 @@ if (!canvas) {
     throw new Error('Canvas not found');
 }
 const ctx = canvas.getContext('2d');
+if (!ctx) {
+    console.error('Canvas context not initialized!');
+    throw new Error('Canvas context not initialized');
+}
 const touchArea = document.getElementById('touch-area');
 const upgradeScreen = document.getElementById('upgrade-screen');
 const upgradeButtons = [
@@ -26,7 +30,7 @@ function resizeCanvas() {
 
     ship.x = canvas.clientWidth / 2;
     ship.y = canvas.clientHeight / 2;
-    console.log('Canvas resized:', canvas.width, canvas.height);
+    console.log('Canvas resized:', canvas.width, canvas.height, 'Ship position:', ship.x, ship.y);
 }
 
 resizeCanvas();
@@ -41,7 +45,7 @@ let enemies = [];
 let projectiles = [];
 let lastFrameTime = performance.now();
 let spawnWedgeStartAngle = Math.random() * Math.PI * 2;
-let isPaused = false;
+let isPaused = false; // Ensure not paused at start
 let fireRate = 0.1;
 let fireDirections = [{ angle: 0 }];
 
@@ -52,6 +56,8 @@ const BASE_ENEMY_SPAWN_RATE = 0.02;
 
 let isTouching = false;
 let touchX = 0;
+
+console.log('Game initialized. isPaused:', isPaused); // Debug initial state
 
 // Define 30 upgrades
 const upgrades = [
@@ -113,6 +119,7 @@ document.addEventListener('keydown', (e) => {
 
 function update(deltaTime) {
     if (!isPaused) {
+        console.log('Update called, deltaTime:', deltaTime); // Debug update
         timeLeft -= deltaTime / 1000;
         document.getElementById('timer').textContent = Math.ceil(timeLeft);
 
@@ -131,8 +138,8 @@ function update(deltaTime) {
                 projectiles.push({
                     x: ship.x,
                     y: ship.y,
-                    dx: Math.cos(shipAngle + dir.angle) * PROJECTILE_SPEED,
-                    dy: Math.sin(shipAngle + dir.angle) * PROJECTILE_SPEED,
+                    dx: Math.cos(shipAngle + dir.angle * (Math.PI / 180)) * PROJECTILE_SPEED, // Convert degrees to radians
+                    dy: Math.sin(shipAngle + dir.angle * (Math.PI / 180)) * PROJECTILE_SPEED,
                 });
             });
         }
@@ -189,6 +196,7 @@ function update(deltaTime) {
 }
 
 function draw() {
+    console.log('Draw called'); // Debug draw
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw ship
@@ -226,6 +234,7 @@ function draw() {
 
 function gameLoop(currentTime) {
     try {
+        console.log('Game loop running, isPaused:', isPaused); // Debug game loop
         const deltaTime = currentTime - lastFrameTime;
         lastFrameTime = currentTime;
 
