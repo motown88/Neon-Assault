@@ -1,6 +1,56 @@
+
+
+body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    touch-action: none;
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 600px;
+    margin: auto;
+    background: black;
+    overflow: hidden;
+    touch-action: none;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    background: black;
+    display: block;
+    touch-action: none;
+}
+
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #00ffff;
+    font-size: 14px;
+    z-index: 20;
+    text-shadow: 0 0 5px #00ffff;
+    line-height: 1.2;
+}
+
+#ui p {
+    margin: 2px 0;
+    display: block;
+}
+
 #move-area {
     position: absolute;
-    bottom: 0; /* Change from top to bottom */
+    top: 0;
     left: 0;
     width: 50%; /* Half the screen width */
     height: 33%; /* One-third of the screen height */
@@ -28,7 +78,7 @@
 
 #touch-area {
     position: absolute;
-    bottom: 0; /* Change from top to bottom */
+    top: 0;
     right: 0;
     width: 50%; /* Half the screen width */
     height: 33%; /* One-third of the screen height */
@@ -52,4 +102,89 @@
     white-space: pre;
     border: none;
     background: none;
+}
+
+/* Upgrade Screen Styling */
+#upgrade-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff;
+    touch-action: none;
+}
+
+#upgrade-screen h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+#upgrade-screen h2 {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+#upgrade-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.upgrade-button {
+    padding: 15px 30px;
+    font-size: 16px;
+    color: #00ffff;
+    background: rgba(0, 255, 255, 0.2);
+    border: 2px solid #00ffff;
+    border-radius: 5px;
+    text-shadow: 0 0 5px #00ffff;
+    cursor: pointer;
+    transition: background 0.3s;
+    touch-action: manipulation;
+}
+
+.upgrade-button:hover {
+    background: rgba(0, 255, 255, 0.4);
+}
+
+@media (min-width: 768px) {
+    #game-container {
+        max-width: 100vw;
+        max-height: 100vh;
+    }
+
+    #move-area, #touch-area {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    #ui {
+        font-size: 12px;
+    }
+
+    #move-area, #touch-area {
+        height: 33%; /* Ensure 33% height on small screens */
+    }
+
+    #upgrade-screen h1 {
+        font-size: 28px;
+    }
+
+    #upgrade-screen h2 {
+        font-size: 20px;
+    }
+
+    .upgrade-button {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
 }
