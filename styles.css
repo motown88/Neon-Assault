@@ -50,7 +50,7 @@ body {
 
 #move-area {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 50%; /* Half the screen width */
     height: 33%; /* One-third of the screen height */
@@ -78,7 +78,7 @@ body {
 
 #touch-area {
     position: absolute;
-    top: 0;
+    bottom: 0;
     right: 0;
     width: 50%; /* Half the screen width */
     height: 33%; /* One-third of the screen height */
