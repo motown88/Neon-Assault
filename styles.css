@@ -50,22 +50,22 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 10%; /* Narrow vertical strip on the left */
-    height: 100%;
+    width: 50%; /* Half the screen width */
+    height: 33%; /* One-third of the screen height */
     background: rgba(0, 255, 0, 0.1); /* Green for debugging */
     z-index: 10;
     pointer-events: auto;
     touch-action: none;
-    border-right: 1px solid #00ff00; /* Green border */
+    border-right: 1px solid #00ff00;
 }
 
-/* Vertical "Move" text along the left side */
+/* "Move" text in the move area */
 #move-area::after {
-    content: "Move\n↑\n↓";
+    content: "Move\n↑\n↓\n←\n→";
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(-90deg); /* Rotate -90 degrees for vertical text */
+    transform: translate(-50%, -50%);
     color: #00ff00;
     text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
     font-size: 16px;
@@ -78,22 +78,22 @@ body {
     position: absolute;
     top: 0;
     right: 0;
-    width: 10%;
-    height: 100%;
-    background: rgba(0, 255, 255, 0.1);
+    width: 50%; /* Half the screen width */
+    height: 33%; /* One-third of the screen height */
+    background: rgba(0, 255, 255, 0.1); /* Cyan for debugging */
     z-index: 10;
     pointer-events: auto;
     touch-action: none;
     border-left: 1px solid #00ffff;
 }
 
-/* Vertical "Spin" text along the right side */
+/* "Spin" text in the spin area */
 #touch-area::after {
     content: "Spin\n↑\n↓";
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(90deg);
+    transform: translate(-50%, -50%);
     color: #00ffff;
     text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
     font-size: 16px;
@@ -170,7 +170,7 @@ body {
     }
 
     #move-area, #touch-area {
-        width: 15%; /* Slightly wider on small screens */
+        height: 33%; /* Ensure 33% height on small screens */
     }
 
     #upgrade-screen h1 {
