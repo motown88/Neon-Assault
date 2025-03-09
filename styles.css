@@ -42,29 +42,45 @@ body {
     margin: 2px 0;
 }
 
-#touch-area {
+#touch-spin {
     position: absolute;
     bottom: 0;
-    width: 100%;
-    height: 20%;
+    right: 0;
+    width: 50px; /* Vertical strip width */
+    height: 100%; /* Full height, but controlled by padding */
     background: black;
     z-index: 10;
     pointer-events: auto;
-    padding-bottom: 10px;
+    padding-bottom: 20%; /* Ensure it doesn't overlap address bar */
 }
 
-#touch-area::after {
-    content: "← Spin →";
+/* Vertical spin indicator */
+#touch-spin::after {
+    content: "↑ Spin ↓";
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    right: 50%;
+    transform: translate(50%, -50%) rotate(-90deg); /* Rotate text vertically */
     color: #00ffff;
     text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
     font-size: 16px;
     white-space: nowrap;
     border: none;
     background: none;
+}
+
+#joystick {
+    position: absolute;
+    bottom: 0;
+    right: 60px; /* Offset from spin area */
+    width: 80px;
+    height: 80px;
+    background: black;
+    z-index: 10;
+    pointer-events: auto;
+    border: 2px solid #00ffff; /* Neon outline */
+    border-radius: 5px; /* Slight rounding */
+    box-shadow: 0 0 10px #00ffff; /* Neon glow */
 }
 
 /* Upgrade Screen Styling */
@@ -122,7 +138,7 @@ body {
         max-height: 100vh;
     }
 
-    #touch-area {
+    #touch-spin, #joystick {
         display: none;
     }
 }
@@ -132,9 +148,15 @@ body {
         font-size: 12px;
     }
 
-    #touch-area {
-        height: 25%;
-        padding-bottom: 15px;
+    #touch-spin {
+        width: 40px;
+        padding-bottom: 25%;
+    }
+
+    #joystick {
+        width: 60px;
+        height: 60px;
+        right: 50px;
     }
 
     #upgrade-screen h1 {
