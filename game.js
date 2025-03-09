@@ -67,7 +67,7 @@ const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
 const BASE_ENEMY_SPAWN_RATE = 0.02;
-const MOVE_SPEED = 5; // Speed for X, Y movement
+const MOVE_SPEED = 5;
 
 let isTouchingSpin = false;
 let touchXSpin = 0;
@@ -78,7 +78,6 @@ let touchYMove = 0;
 console.log('Game initialized. isPaused:', isPaused);
 
 const upgrades = [
-    // Shield Upgrades
     { name: "Shield Boost", type: "shields", value: 1, rarity: "Common", description: "+1 Shield" },
     { name: "Energy Barrier", type: "shields", value: 2, rarity: "Rare", description: "+2 Shields" },
     { name: "Neon Fortress", type: "shields", value: 3, rarity: "Epic", description: "+3 Shields" },
@@ -89,8 +88,6 @@ const upgrades = [
     { name: "Aegis Protocol", type: "shields", value: 2, rarity: "Rare", description: "+2 Shields" },
     { name: "Titan Armor", type: "shields", value: 3, rarity: "Epic", description: "+3 Shields" },
     { name: "Reactive Plating", type: "shields", value: 1, rarity: "Common", description: "+1 Shield" },
-
-    // Fire Rate Upgrades
     { name: "Rapid Fire", type: "fireRate", value: 0.05, rarity: "Common", description: "+5% Fire Rate" },
     { name: "Turbo Blaster", type: "fireRate", value: 0.1, rarity: "Rare", description: "+10% Fire Rate" },
     { name: "Hyper Volley", type: "fireRate", value: 0.15, rarity: "Epic", description: "+15% Fire Rate" },
@@ -101,8 +98,6 @@ const upgrades = [
     { name: "Ion Overdrive", type: "fireRate", value: 0.1, rarity: "Rare", description: "+10% Fire Rate" },
     { name: "Starfire Surge", type: "fireRate", value: 0.15, rarity: "Epic", description: "+15% Fire Rate" },
     { name: "Blaster Tune-Up", type: "fireRate", value: 0.05, rarity: "Common", description: "+5% Fire Rate" },
-
-    // Firing Direction Upgrades
     { name: "Dual Shot", type: "fireDirection", value: [{ angle: -15 }, { angle: 15 }], rarity: "Common", description: "Fire two streams at ±15°" },
     { name: "Triad Beam", type: "fireDirection", value: [{ angle: -30 }, { angle: 0 }, { angle: 30 }], rarity: "Rare", description: "Fire three streams at ±30°" },
     { name: "Omni Blast", type: "fireDirection", value: [{ angle: 0 }, { angle: 180 }], rarity: "Epic", description: "Fire front and back" },
@@ -133,7 +128,7 @@ moveArea.addEventListener('touchend', () => {
 
 touchArea.addEventListener('touchstart', (e) => {
     isTouchingSpin = true;
-    touchXSpin = e.touches[0].clientY; // Use clientY for vertical movement
+    touchXSpin = e.touches[0].clientY;
     lastTouchY = touchXSpin;
     touchYHistory = [touchXSpin];
     console.log('Spin touch started at:', touchXSpin);
@@ -167,7 +162,7 @@ function update(deltaTime) {
         // Smooth spin control
         if (isTouchingSpin && touchYHistory.length > 0) {
             const averageY = touchYHistory.reduce((a, b) => a + b) / touchYHistory.length;
-            const moveY = (lastTouchY - averageY) * 0.02; // Increased sensitivity and smoothing
+            const moveY = (lastTouchY - averageY) * 0.02;
             shipAngle += moveY;
             lastTouchY = averageY;
             console.log('Ship angle updated to:', shipAngle);
@@ -179,15 +174,17 @@ function update(deltaTime) {
             const moveZoneWidth = moveArea.clientWidth;
             const centerX = moveZoneWidth / 2;
             const centerY = moveZoneHeight / 2;
-            const touchOffsetX = (touchXMove - centerX) / centerX; // Normalize to -1 to 1
-            const touchOffsetY = (touchYMove - centerY) / centerY; // Normalize to -1 to 1
+            const touchOffsetX = (touchXMove - centerX) / centerX;
+            const touchOffsetY = (touchYMove - centerY) / centerY;
             ship.x += touchOffsetX * MOVE_SPEED;
             ship.y += touchOffsetY * MOVE_SPEED;
 
-            // Constrain ship within canvas
-            ship.x = Math.max(SHIP_SIZE, Math.min(canvas.width - SHIP_SIZE, ship.x));
-            ship.y = Math.max(SHIP_SIZE, Math.min(canvas.height - SHIP_SIZE, ship.y));
-            console.log('Ship moved to:', ship.x, ship.y);
+            // Improved boundary constraints
+            const visibleWidth = canvas.clientWidth;
+            const visibleHeight = canvas.clientHeight;
+            ship.x = Math.max(SHIP_SIZE, Math.min(visibleWidth - SHIP_SIZE, ship.x));
+            ship.y = Math.max(SHIP_SIZE, Math.min(visibleHeight - SHIP_SIZE, ship.y));
+            console.log('Ship moved to:', ship.x, ship.y, 'Visible area:', visibleWidth, visibleHeight);
         }
 
         if (Math.random() < fireRate) {
