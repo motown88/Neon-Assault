@@ -14,6 +14,11 @@ if (!ctx) {
     console.error('Canvas context not initialized!');
     throw new Error('Canvas context not initialized');
 }
+const moveArea = document.getElementById('move-area');
+if (!moveArea) {
+    console.error('Move area element not found! Check the id in index.html.');
+    throw new Error('Move area not found');
+}
 const touchArea = document.getElementById('touch-area');
 if (!touchArea) {
     console.error('Touch area element not found! Check the id in index.html.');
@@ -53,13 +58,22 @@ let isPaused = false;
 let fireRate = 0.1;
 let fireDirections = [{ angle: 0 }];
 
+// Smoothing variables for spin
+const SMOOTHING_FRAMES = 5;
+let touchYHistory = [];
+let lastTouchY = 0;
+
 const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
 const BASE_ENEMY_SPAWN_RATE = 0.02;
+const MOVE_SPEED = 5; // Speed for X, Y movement
 
-let isTouching = false;
-let touchX = 0;
+let isTouchingSpin = false;
+let touchXSpin = 0;
+let isTouchingMove = false;
+let touchXMove = 0;
+let touchYMove = 0;
 
 console.log('Game initialized. isPaused:', isPaused);
 
@@ -101,18 +115,38 @@ const upgrades = [
     { name: "Wide Arc", type: "fireDirection", value: [{ angle: -25 }, { angle: 25 }], rarity: "Common", description: "Fire two streams at ±25°" },
 ];
 
+moveArea.addEventListener('touchstart', (e) => {
+    isTouchingMove = true;
+    touchXMove = e.touches[0].clientX;
+    touchYMove = e.touches[0].clientY;
+    console.log('Move touch started at:', touchXMove, touchYMove);
+});
+moveArea.addEventListener('touchmove', (e) => {
+    touchXMove = e.touches[0].clientX;
+    touchYMove = e.touches[0].clientY;
+    console.log('Move touch moved to:', touchXMove, touchYMove);
+});
+moveArea.addEventListener('touchend', () => {
+    isTouchingMove = false;
+    console.log('Move touch ended');
+});
+
 touchArea.addEventListener('touchstart', (e) => {
-    isTouching = true;
-    touchX = e.touches[0].clientX;
-    console.log('Touch started at:', touchX);
+    isTouchingSpin = true;
+    touchXSpin = e.touches[0].clientY; // Use clientY for vertical movement
+    lastTouchY = touchXSpin;
+    touchYHistory = [touchXSpin];
+    console.log('Spin touch started at:', touchXSpin);
 });
 touchArea.addEventListener('touchmove', (e) => {
-    touchX = e.touches[0].clientX;
-    console.log('Touch moved to:', touchX);
+    touchXSpin = e.touches[0].clientY;
+    touchYHistory.push(touchXSpin);
+    if (touchYHistory.length > SMOOTHING_FRAMES) touchYHistory.shift();
+    console.log('Spin touch moved to:', touchXSpin);
 });
 touchArea.addEventListener('touchend', () => {
-    isTouching = false;
-    console.log('Touch ended');
+    isTouchingSpin = false;
+    console.log('Spin touch ended');
 });
 
 document.addEventListener('keydown', (e) => {
@@ -130,10 +164,30 @@ function update(deltaTime) {
             showUpgradeScreen();
         }
 
-        if (isTouching) {
-            const touchZoneWidth = touchArea.clientWidth;
-            shipAngle = -((touchX / touchZoneWidth) - 0.5) * Math.PI * 4;
+        // Smooth spin control
+        if (isTouchingSpin && touchYHistory.length > 0) {
+            const averageY = touchYHistory.reduce((a, b) => a + b) / touchYHistory.length;
+            const moveY = (lastTouchY - averageY) * 0.02; // Increased sensitivity and smoothing
+            shipAngle += moveY;
+            lastTouchY = averageY;
             console.log('Ship angle updated to:', shipAngle);
+        }
+
+        // Move control
+        if (isTouchingMove) {
+            const moveZoneHeight = moveArea.clientHeight;
+            const moveZoneWidth = moveArea.clientWidth;
+            const centerX = moveZoneWidth / 2;
+            const centerY = moveZoneHeight / 2;
+            const touchOffsetX = (touchXMove - centerX) / centerX; // Normalize to -1 to 1
+            const touchOffsetY = (touchYMove - centerY) / centerY; // Normalize to -1 to 1
+            ship.x += touchOffsetX * MOVE_SPEED;
+            ship.y += touchOffsetY * MOVE_SPEED;
+
+            // Constrain ship within canvas
+            ship.x = Math.max(SHIP_SIZE, Math.min(canvas.width - SHIP_SIZE, ship.x));
+            ship.y = Math.max(SHIP_SIZE, Math.min(canvas.height - SHIP_SIZE, ship.y));
+            console.log('Ship moved to:', ship.x, ship.y);
         }
 
         if (Math.random() < fireRate) {
