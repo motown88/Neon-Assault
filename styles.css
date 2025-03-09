@@ -43,20 +43,48 @@ body {
 
 #ui p {
     margin: 2px 0;
-    display: block; /* Ensure each p is on a new line */
+    display: block;
+}
+
+#move-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10%; /* Narrow vertical strip on the left */
+    height: 100%;
+    background: rgba(0, 255, 0, 0.1); /* Green for debugging */
+    z-index: 10;
+    pointer-events: auto;
+    touch-action: none;
+    border-right: 1px solid #00ff00; /* Green border */
+}
+
+/* Vertical "Move" text along the left side */
+#move-area::after {
+    content: "Move\n↑\n↓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg); /* Rotate -90 degrees for vertical text */
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+    font-size: 16px;
+    white-space: pre;
+    border: none;
+    background: none;
 }
 
 #touch-area {
     position: absolute;
     top: 0;
     right: 0;
-    width: 10%; /* Narrow vertical strip on the right */
+    width: 10%;
     height: 100%;
-    background: rgba(0, 255, 255, 0.1); /* Visible for debugging */
+    background: rgba(0, 255, 255, 0.1);
     z-index: 10;
     pointer-events: auto;
     touch-action: none;
-    border-left: 1px solid #00ffff; /* Visible border on the left edge */
+    border-left: 1px solid #00ffff;
 }
 
 /* Vertical "Spin" text along the right side */
@@ -65,11 +93,11 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(90deg); /* Rotate 90 degrees for vertical text */
+    transform: translate(-50%, -50%) rotate(90deg);
     color: #00ffff;
     text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
     font-size: 16px;
-    white-space: pre; /* Preserve line breaks */
+    white-space: pre;
     border: none;
     background: none;
 }
@@ -131,7 +159,7 @@ body {
         max-height: 100vh;
     }
 
-    #touch-area {
+    #move-area, #touch-area {
         display: none;
     }
 }
@@ -141,7 +169,7 @@ body {
         font-size: 12px;
     }
 
-    #touch-area {
+    #move-area, #touch-area {
         width: 15%; /* Slightly wider on small screens */
     }
 
