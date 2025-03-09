@@ -67,7 +67,8 @@ const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
 const BASE_ENEMY_SPAWN_RATE = 0.02;
-const MOVE_SPEED = 5;
+const MOVE_SPEED = 10; // Increased from 5 to 10 for more sensitivity
+const MOVE_SENSITIVITY = 2; // Multiplier to amplify touch offset
 
 let isTouchingSpin = false;
 let touchXSpin = 0;
@@ -168,18 +169,18 @@ function update(deltaTime) {
             console.log('Ship angle updated to:', shipAngle);
         }
 
-        // Move control
+        // Move control with increased sensitivity
         if (isTouchingMove) {
             const moveZoneHeight = moveArea.clientHeight;
             const moveZoneWidth = moveArea.clientWidth;
             const centerX = moveZoneWidth / 2;
             const centerY = moveZoneHeight / 2;
-            const touchOffsetX = (touchXMove - centerX) / centerX;
-            const touchOffsetY = (touchYMove - centerY) / centerY;
+            const touchOffsetX = ((touchXMove - centerX) / centerX) * MOVE_SENSITIVITY; // Amplify with sensitivity
+            const touchOffsetY = ((touchYMove - centerY) / centerY) * MOVE_SENSITIVITY; // Amplify with sensitivity
             ship.x += touchOffsetX * MOVE_SPEED;
             ship.y += touchOffsetY * MOVE_SPEED;
 
-            // Improved boundary constraints
+            // Boundary constraints
             const visibleWidth = canvas.clientWidth;
             const visibleHeight = canvas.clientHeight;
             ship.x = Math.max(SHIP_SIZE, Math.min(visibleWidth - SHIP_SIZE, ship.x));
