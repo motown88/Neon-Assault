@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Assault</title>
     <!-- Use absolute path to ensure CSS loads from root -->
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css" onload="console.log('CSS loaded')" onerror="console.error('CSS failed to load')">
 </head>
 <body>
     <div id="game-container">
@@ -46,10 +46,10 @@
             <button id="new-game" class="neon-button">New Game</button>
         </div>
     </div>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
-    <!-- Use absolute path to ensure JS loads from root -->
-    <script src="/game.js"></script>
+    <!-- Firebase SDK with error handling -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js" onload="console.log('Firebase App loaded')" onerror="console.error('Firebase App failed to load')"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js" onload="console.log('Firebase Firestore loaded')" onerror="console.error('Firebase Firestore failed to load')"></script>
+    <!-- Use absolute path to ensure JS loads from root with error handling -->
+    <script src="/game.js" onload="console.log('Game JS loaded')" onerror="console.error('Game JS failed to load')"></script>
 </body>
 </html>
