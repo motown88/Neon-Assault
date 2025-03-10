@@ -11,6 +11,7 @@ const firebaseConfig = {
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+console.log('Firebase initialized:', app.name, db);
 
 const ship = {
     x: 0,
@@ -23,21 +24,25 @@ if (!canvas) {
     console.error('Canvas element not found! Check the id in index.html and script loading order.');
     throw new Error('Canvas not found');
 }
+console.log('Canvas found:', canvas);
 const ctx = canvas.getContext('2d');
 if (!ctx) {
     console.error('Canvas context not initialized!');
     throw new Error('Canvas context not initialized');
 }
+console.log('Canvas context initialized:', ctx);
 const moveArea = document.getElementById('move-area');
 if (!moveArea) {
     console.error('Move area element not found! Check the id in index.html.');
     throw new Error('Move area not found');
 }
+console.log('Move area found:', moveArea);
 const touchArea = document.getElementById('touch-area');
 if (!touchArea) {
     console.error('Touch area element not found! Check the id in index.html.');
     throw new Error('Touch area not found');
 }
+console.log('Touch area found:', touchArea);
 const upgradeScreen = document.getElementById('upgrade-screen');
 const upgradeButtons = [
     document.getElementById('upgrade1'),
@@ -78,7 +83,6 @@ let isPaused = false;
 let fireRate = 0.1;
 let fireDirections = [{ angle: 0 }];
 
-// Smoothing variables for spin
 const SMOOTHING_FRAMES = 5;
 let touchYHistory = [];
 let lastTouchY = 0;
@@ -460,11 +464,8 @@ function loadLeaderboard() {
         });
 }
 
-// Event Listeners for Game-Over Screen
 submitScoreButton.addEventListener('click', saveScore);
 newGameButton.addEventListener('click', resetGame);
 
-// Load leaderboard on page load (optional, shows initial state)
 loadLeaderboard();
-
 requestAnimationFrame(gameLoop);
