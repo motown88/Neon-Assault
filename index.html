@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Assault</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- Use absolute path to ensure CSS loads from root -->
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <div id="game-container">
@@ -15,8 +16,8 @@
             <p>Level: <span id="level">1</span></p>
             <p>Time: <span id="timer">15</span></p>
         </div>
-        <div id="move-area"></div> <!-- New touch area for X, Y movement -->
-        <div id="touch-area"></div> <!-- Spin control -->
+        <div id="move-area"></div>
+        <div id="touch-area"></div>
         <div id="upgrade-screen" style="display: none;">
             <h1>Level Complete</h1>
             <h2>Choose an Upgrade</h2>
@@ -48,6 +49,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
-    <script src="game.js"></script>
+    <!-- Use absolute path to ensure JS loads from root -->
+    <script src="/game.js"></script>
 </body>
 </html>
