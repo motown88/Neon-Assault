@@ -1,17 +1,21 @@
-// Firebase Initialization
-const firebaseConfig = {
-    apiKey: "AIzaSyBHsHYGjohUTw5D2_CPlUBlmjoxMie-L5s",
-    authDomain: "leader-board-216ac.firebaseapp.com",
-    projectId: "leader-board-216ac",
-    storageBucket: "leader-board-216ac.firebasestorage.app",
-    messagingSenderId: "777301862678",
-    appId: "1:777301862678:web:5b2a170163e9312f7c0837",
-    measurementId: "G-CL0YJ2EEFE"
-};
+// Firebase Initialization with try-catch
+try {
+    const firebaseConfig = {
+        apiKey: "AIzaSyBHsHYGjohUTw5D2_CPlUBlmjoxMie-L5s",
+        authDomain: "leader-board-216ac.firebaseapp.com",
+        projectId: "leader-board-216ac",
+        storageBucket: "leader-board-216ac.firebasestorage.app",
+        messagingSenderId: "777301862678",
+        appId: "1:777301862678:web:5b2a170163e9312f7c0837",
+        measurementId: "G-CL0YJ2EEFE"
+    };
 
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-console.log('Firebase initialized:', app.name, db);
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    console.log('Firebase initialized:', app.name, db);
+} catch (error) {
+    console.error('Firebase initialization failed:', error);
+}
 
 const ship = {
     x: 0,
