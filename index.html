@@ -26,7 +26,28 @@
                 <button id="upgrade3" class="upgrade-button"></button>
             </div>
         </div>
+        <div id="game-over-screen" style="display: none;">
+            <h1>Game Over</h1>
+            <p>Your Score: <span id="final-score">0</span></p>
+            <input type="text" id="player-name" placeholder="Enter your name">
+            <button id="submit-score" class="neon-button">Submit Score</button>
+            <h2>Leaderboard</h2>
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+            <button id="new-game" class="neon-button">New Game</button>
+        </div>
     </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"></script>
     <script src="game.js"></script>
 </body>
 </html>
