@@ -1,3 +1,17 @@
+// Firebase Initialization
+const firebaseConfig = {
+    apiKey: "AIzaSyBHsHYGjohUTw5D2_CPlUBlmjoxMie-L5s",
+    authDomain: "leader-board-216ac.firebaseapp.com",
+    projectId: "leader-board-216ac",
+    storageBucket: "leader-board-216ac.firebasestorage.app",
+    messagingSenderId: "777301862678",
+    appId: "1:777301862678:web:5b2a170163e9312f7c0837",
+    measurementId: "G-CL0YJ2EEFE"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 const ship = {
     x: 0,
     y: 0,
@@ -30,6 +44,12 @@ const upgradeButtons = [
     document.getElementById('upgrade2'),
     document.getElementById('upgrade3')
 ];
+const gameOverScreen = document.getElementById('game-over-screen');
+const finalScoreDisplay = document.getElementById('final-score');
+const playerNameInput = document.getElementById('player-name');
+const submitScoreButton = document.getElementById('submit-score');
+const leaderboardBody = document.getElementById('leaderboard-body');
+const newGameButton = document.getElementById('new-game');
 
 function resizeCanvas() {
     const dpr = window.devicePixelRatio || 1;
@@ -67,8 +87,8 @@ const SHIP_SIZE = 20;
 const ENEMY_SIZE = 15;
 const PROJECTILE_SPEED = 5;
 const BASE_ENEMY_SPAWN_RATE = 0.02;
-const MOVE_SPEED = 10; // Increased from 5 to 10 for more sensitivity
-const MOVE_SENSITIVITY = 2; // Multiplier to amplify touch offset
+const MOVE_SPEED = 10;
+const MOVE_SENSITIVITY = 2;
 
 let isTouchingSpin = false;
 let touchXSpin = 0;
@@ -157,11 +177,10 @@ function update(deltaTime) {
         document.getElementById('timer').textContent = Math.ceil(timeLeft);
 
         if (timeLeft <= 0) {
-            enemies = []; // Clear enemies at the end of the level
+            enemies = [];
             showUpgradeScreen();
         }
 
-        // Smooth spin control
         if (isTouchingSpin && touchYHistory.length > 0) {
             const averageY = touchYHistory.reduce((a, b) => a + b) / touchYHistory.length;
             const moveY = (lastTouchY - averageY) * 0.02;
@@ -170,7 +189,6 @@ function update(deltaTime) {
             console.log('Ship angle updated to:', shipAngle);
         }
 
-        // Move control with increased sensitivity (corrected for local coordinates)
         if (isTouchingMove) {
             const moveAreaRect = moveArea.getBoundingClientRect();
             const moveZoneWidth = moveAreaRect.width;
@@ -178,15 +196,12 @@ function update(deltaTime) {
             const centerX = moveAreaRect.left + moveZoneWidth / 2;
             const centerY = moveAreaRect.top + moveZoneHeight / 2;
 
-            // Calculate touch offset relative to the center of move-area
             const touchOffsetX = ((touchXMove - centerX) / (moveZoneWidth / 2)) * MOVE_SENSITIVITY;
             const touchOffsetY = ((touchYMove - centerY) / (moveZoneHeight / 2)) * MOVE_SENSITIVITY;
 
-            // Update ship position
             ship.x += touchOffsetX * MOVE_SPEED;
             ship.y += touchOffsetY * MOVE_SPEED;
 
-            // Boundary constraints
             const visibleWidth = canvas.clientWidth;
             const visibleHeight = canvas.clientHeight;
             ship.x = Math.max(SHIP_SIZE, Math.min(visibleWidth - SHIP_SIZE, ship.x));
@@ -206,7 +221,7 @@ function update(deltaTime) {
         }
 
         const maxAngleRange = Math.min((Math.PI / 2) * level, Math.PI * 2);
-        const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (1 + (level - 1) * 0.3); // Slower progression: Changed from 0.5 to 0.3
+        const effectiveSpawnRate = BASE_ENEMY_SPAWN_RATE * (1 + (level - 1) * 0.3);
 
         if (Math.random() < effectiveSpawnRate) {
             const angleRange = maxAngleRange / 2;
@@ -260,12 +275,10 @@ function draw() {
     console.log('Draw called');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw ship and shields
     ctx.save();
     ctx.translate(ship.x, ship.y);
     ctx.rotate(shipAngle);
 
-    // Draw the ship (filled triangle)
     ctx.fillStyle = '#00ffff';
     ctx.beginPath();
     ctx.moveTo(SHIP_SIZE, 0);
@@ -274,18 +287,16 @@ function draw() {
     ctx.closePath();
     ctx.fill();
 
-    // Draw shield outlines with enhanced effect
     if (shields > 0) {
-        ctx.strokeStyle = '#00ffff'; // Cyan color for shields
-        ctx.lineWidth = 3; // Thicker outline for better visibility
-        ctx.shadowBlur = 15; // Increased glow effect
-        ctx.shadowColor = '#00ffff'; // Cyan glow
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 3;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#00ffff';
 
-        // Draw one outline for each shield
         for (let i = 0; i < shields; i++) {
-            const scaleFactor = 1 + (i * 0.15); // Increased spacing (was 0.1, now 0.15)
-            const opacity = 1 - (i * 0.05); // Slight fade for outer shields (1 to 0.5)
-            ctx.globalAlpha = opacity; // Apply opacity to make outer shields fainter
+            const scaleFactor = 1 + (i * 0.15);
+            const opacity = 1 - (i * 0.05);
+            ctx.globalAlpha = opacity;
             ctx.beginPath();
             ctx.moveTo(SHIP_SIZE * scaleFactor, 0);
             ctx.lineTo(-SHIP_SIZE / 2 * scaleFactor, SHIP_SIZE / 2 * scaleFactor);
@@ -294,14 +305,12 @@ function draw() {
             ctx.stroke();
         }
 
-        // Reset global alpha and shadow for other drawings
         ctx.globalAlpha = 1;
         ctx.shadowBlur = 0;
     }
 
     ctx.restore();
 
-    // Draw projectiles
     ctx.fillStyle = '#ffff00';
     projectiles.forEach(p => {
         ctx.beginPath();
@@ -309,7 +318,6 @@ function draw() {
         ctx.fill();
     });
 
-    // Draw enemies with neon effect
     ctx.fillStyle = '#ff00ff';
     ctx.shadowBlur = 10;
     ctx.shadowColor = '#ff00ff';
@@ -371,9 +379,9 @@ function applyUpgrade(upgrade) {
 
 function levelUp() {
     level++;
-    timeLeft = 15; // All levels are now 15 seconds (changed from 30)
-    ship.x = canvas.clientWidth / 2; // Reset ship to center
-    ship.y = canvas.clientHeight / 2; // Reset ship to center
+    timeLeft = 15;
+    ship.x = canvas.clientWidth / 2;
+    ship.y = canvas.clientHeight / 2;
     document.getElementById('level').textContent = level;
     document.getElementById('timer').textContent = timeLeft;
     spawnWedgeStartAngle = Math.random() * Math.PI * 2;
@@ -381,7 +389,14 @@ function levelUp() {
 }
 
 function gameOver() {
-    alert(`Game Over! Score: ${score}`);
+    isPaused = true;
+    finalScoreDisplay.textContent = score;
+    gameOverScreen.style.display = 'flex';
+    playerNameInput.value = '';
+    loadLeaderboard();
+}
+
+function resetGame() {
     shields = 3;
     score = 0;
     level = 1;
@@ -391,13 +406,65 @@ function gameOver() {
     fireRate = 0.1;
     fireDirections = [{ angle: 0 }];
     spawnWedgeStartAngle = Math.random() * Math.PI * 2;
-    ship.x = canvas.clientWidth / 2; // Reset ship to center on game over
-    ship.y = canvas.clientHeight / 2; // Reset ship to center on game over
+    ship.x = canvas.clientWidth / 2;
+    ship.y = canvas.clientHeight / 2;
     document.getElementById('shields').textContent = shields;
     document.getElementById('score').textContent = score;
     document.getElementById('level').textContent = level;
     document.getElementById('timer').textContent = timeLeft;
+    gameOverScreen.style.display = 'none';
     isPaused = false;
 }
+
+function saveScore() {
+    const name = playerNameInput.value.trim();
+    if (!name) {
+        alert('Please enter a name!');
+        return;
+    }
+
+    db.collection('scores').add({
+        name: name,
+        score: score,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        playerNameInput.value = '';
+        submitScoreButton.disabled = true;
+        loadLeaderboard();
+    }).catch(error => {
+        console.error('Error saving score:', error);
+    });
+}
+
+function loadLeaderboard() {
+    db.collection('scores')
+        .orderBy('score', 'desc')
+        .limit(10)
+        .get()
+        .then(querySnapshot => {
+            leaderboardBody.innerHTML = '';
+            let rank = 1;
+            querySnapshot.forEach(doc => {
+                const data = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${rank}</td>
+                    <td>${data.name}</td>
+                    <td>${data.score}</td>
+                `;
+                leaderboardBody.appendChild(row);
+                rank++;
+            });
+        }).catch(error => {
+            console.error('Error loading leaderboard:', error);
+        });
+}
+
+// Event Listeners for Game-Over Screen
+submitScoreButton.addEventListener('click', saveScore);
+newGameButton.addEventListener('click', resetGame);
+
+// Load leaderboard on page load (optional, shows initial state)
+loadLeaderboard();
 
 requestAnimationFrame(gameLoop);
